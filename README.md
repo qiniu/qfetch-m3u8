@@ -1,6 +1,6 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/qiniu/qfetch)](https://goreportcard.com/report/github.com/qiniu/qfetch)
 
-#qfetch
+#qfetch-m3u8(抓取m3u8文件的专用qfetch)
 
 ###简介
 qfetch是一个数据迁移工具，利用七牛提供的[fetch](http://developer.qiniu.com/docs/v6/api/reference/rs/fetch.html)功能来抓取指定文件列表中的文件。在文件列表中，你只需要提供资源的外链地址和要保存在七牛空间中的文件名就可以了。
@@ -20,7 +20,7 @@ qfetch是一个数据迁移工具，利用七牛提供的[fetch](http://develope
 
 |版本     |支持平台|链接|
 |--------|---------|----|
-|qfetch v1.7|Linux, Windows, Mac OSX|[下载](http://devtools.qiniu.com/qfetch-v1.7.zip)|
+|qfetch-m3u8 v1.8|Linux, Windows, Mac OSX|[下载](http://devtools.qiniu.com/qfetch-m3u8-v1.8.zip)|
 
 ###安装
 
@@ -28,13 +28,13 @@ qfetch是一个数据迁移工具，利用七牛提供的[fetch](http://develope
 
 |文件名|描述|
 |-----|-----|
-|qfetch_linux_386|Linux 32位系统|
-|qfetch_linux_amd64|Linux 64位系统|
-|qfetch_linux_arm|Linux ARM CPU|
-|qfetch_windows_386.exe|Windows 32位系统|
-|qfetch_windows_amd64.exe|Windows 64位系统|
-|qfetch_darwin_386|Mac 32位系统，这种系统很老了|
-|qfetch_darwin_amd64|Mac 64位系统，主流的系统|
+|qfetch-m3u8_linux_386|Linux 32位系统|
+|qfetch-m3u8_linux_amd64|Linux 64位系统|
+|qfetch-m3u8_linux_arm|Linux ARM CPU|
+|qfetch-m3u8_windows_386.exe|Windows 32位系统|
+|qfetch-m3u8_windows_amd64.exe|Windows 64位系统|
+|qfetch-m3u8_darwin_386|Mac 32位系统，这种系统很老了|
+|qfetch-m3u8_darwin_amd64|Mac 64位系统，主流的系统|
 
 注意，如果在Linux或者Mac系统上遇到`Permission Denied`的错误，请使用命令`chmod +x qfetch`来为文件添加可执行权限。这里的`qfetch`是上面文件重命名之后的简写。
 

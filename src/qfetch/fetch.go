@@ -29,7 +29,8 @@ func doFetch(tasks chan func()) {
 	}
 }
 
-func Fetch(job string, checkExists bool, fileListPath, bucket, accessKey, secretKey string, worker int, zone, logFile string) {
+func Fetch(job string, checkExists bool, fileListPath, bucket, accessKey, secretKey string,
+	worker int, zone, logFile string) {
 	//open file list to fetch
 	fh, openErr := os.Open(fileListPath)
 	if openErr != nil {

@@ -219,8 +219,12 @@ func FetchM3u8(bucket, m3u8Key, m3u8Url string, checkExists bool, client *rs.Cli
 				} else {
 					//check m3u8 url to find ts prefix
 					tsKeyPrefix := strings.TrimPrefix(filepath.Dir(m3u8Uri.Path), "/")
-					//Dir function removes the last / of the path, so there is a new / here
-					tsKey = fmt.Sprintf("%s/%s", tsKeyPrefix, m3u8Line)
+					if tsKeyPrefix != "" {
+						//Dir function removes the last / of the path, so there is a new / here
+						tsKey = fmt.Sprintf("%s/%s", tsKeyPrefix, m3u8Line)
+					} else {
+						tsKey = m3u8Line
+					}
 				}
 				tsDomain = fmt.Sprintf("%s://%s", m3u8Uri.Scheme, m3u8Uri.Host)
 			}

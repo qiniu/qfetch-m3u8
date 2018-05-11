@@ -4,12 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"github.com/qiniu/api.v6/auth/digest"
-	"github.com/qiniu/api.v6/conf"
-	"github.com/qiniu/api.v6/rs"
-	"github.com/qiniu/log"
-	"github.com/qiniu/rpc"
-	"github.com/syndtr/goleveldb/leveldb"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -17,6 +11,12 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+
+	"github.com/qiniu/api.v6/auth/digest"
+	"github.com/qiniu/api.v6/rs"
+	"github.com/qiniu/log"
+	"github.com/qiniu/rpc"
+	"github.com/syndtr/goleveldb/leveldb"
 )
 
 var once sync.Once
@@ -29,8 +29,8 @@ func doFetch(tasks chan func()) {
 	}
 }
 
-func Fetch(job string, checkExists bool, fileListPath, bucket, accessKey, secretKey string,
-	worker int, zone, logFile string) {
+func Fetch(mac *digest.Mac, job string, checkExists bool, fileListPath, bucket, accessKey, secretKey string,
+	worker int, logFile string) {
 	//open file list to fetch
 	fh, openErr := os.Open(fileListPath)
 	if openErr != nil {
@@ -71,24 +71,7 @@ func Fetch(job string, checkExists bool, fileListPath, bucket, accessKey, secret
 	}
 	defer notFoundLdb.Close()
 
-	//fetch prepare
-	switch zone {
-	case "bc":
-		conf.IO_HOST = "http://iovip-z1.qbox.me"
-	case "hn":
-		conf.IO_HOST = "http://iovip-z2.qbox.me"
-	case "aws":
-		conf.IO_HOST = "http://iovip.gdipper.com"
-	case "na0":
-		conf.IO_HOST = "http://iovip-na0.qbox.me"
-	default:
-		conf.IO_HOST = "http://iovip.qbox.me"
-	}
-
-	mac := digest.Mac{
-		accessKey, []byte(secretKey),
-	}
-	client := rs.New(&mac)
+	client := rs.New(mac)
 
 	//init work group
 	once.Do(func() {

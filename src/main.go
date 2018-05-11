@@ -6,6 +6,9 @@ import (
 	"os"
 	"qfetch"
 	"runtime"
+
+	"github.com/qiniu/api.v6/auth/digest"
+	"github.com/qiniu/api.v6/conf"
 )
 
 func main() {
@@ -17,9 +20,12 @@ func main() {
 	var bucket string
 	var accessKey string
 	var secretKey string
-	var zone string
 	var logFile string
 	var checkExists bool
+
+	//support qos, should be specified both
+	var rsHost string
+	var ioHost string
 
 	flag.Usage = func() {
 		fmt.Println(`Usage of qfetch:
@@ -31,20 +37,21 @@ func main() {
   -worker=0: max goroutine in a worker group
   -check-exists: check whether file exists in bucket
   -log="": fetch runtime log file
-  -zone="nb": qiniu zone, nb, bc, hn or na0
-
- version 1.8`)
+  -rs-host="": rs host to support specified qos system
+  -io-host="": io host to support specified qos sytem
+ version 1.9`)
 	}
 
 	flag.StringVar(&job, "job", "", "job name to record the progress")
-	flag.IntVar(&worker, "worker", 0, "max goroutine in a worker group")
+	flag.IntVar(&worker, "worker", 1, "max goroutine in a worker group")
 	flag.StringVar(&file, "file", "", "resource file to fetch")
 	flag.StringVar(&bucket, "bucket", "", "qiniu bucket")
 	flag.StringVar(&accessKey, "ak", "", "qiniu access key")
 	flag.StringVar(&secretKey, "sk", "", "qiniu secret key")
-	flag.StringVar(&zone, "zone", "nb", "qiniu zone, nb, bc, hn or na0")
 	flag.StringVar(&logFile, "log", "", "fetch runtime log file")
 	flag.BoolVar(&checkExists, "check-exists", false, "check whether file exists in bucket")
+	flag.StringVar(&rsHost, "rs-host", "", "rs host to support specified qos system")
+	flag.StringVar(&ioHost, "io-host", "", "io host to support specified qos system")
 
 	flag.Parse()
 
@@ -83,10 +90,43 @@ func main() {
 		return
 	}
 
-	if !(zone == "nb" || zone == "bc" || zone == "hn" || zone == "aws" || zone == "na0") {
-		fmt.Println("Error: zone is incorrect")
+	if (rsHost != "" && ioHost == "") || (rsHost == "" && ioHost != "") {
+		fmt.Println("Error: rs host and io host should be specified together")
 		return
 	}
 
-	qfetch.Fetch(job, checkExists, file, bucket, accessKey, secretKey, worker, zone, logFile)
+	mac := digest.Mac{
+		accessKey, []byte(secretKey),
+	}
+
+	if rsHost != "" && ioHost != "" {
+		conf.IO_HOST = ioHost
+		conf.RS_HOST = rsHost
+	} else {
+		//get bucket info
+		bucktInfo, gErr := qfetch.GetBucketInfo(&mac, bucket)
+		if gErr != nil {
+			fmt.Println("Error: get bucket info error", gErr)
+			return
+		} else {
+			switch bucktInfo.Region {
+			case "z0":
+				conf.RS_HOST = "http://rs.qbox.me"
+				conf.IO_HOST = "http://iovip.qbox.me"
+			case "z1":
+				conf.RS_HOST = "http://rs-z1.qbox.me"
+				conf.IO_HOST = "http://iovip-z1.qbox.me"
+			case "z2":
+				conf.RS_HOST = "http://rs-z2.qbox.me"
+				conf.IO_HOST = "http://iovip-z2.qbox.me"
+			case "na0":
+				conf.RS_HOST = "http://rs-na0.qbox.me"
+				conf.IO_HOST = "http://iovip-na0.qbox.me"
+			case "as0":
+				conf.RS_HOST = "http://rs-as0.qbox.me"
+				conf.IO_HOST = "http://iovip-as0.qbox.me"
+			}
+		}
+	}
+	qfetch.Fetch(&mac, job, checkExists, file, bucket, accessKey, secretKey, worker, logFile)
 }

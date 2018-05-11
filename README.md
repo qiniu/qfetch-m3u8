@@ -7,6 +7,8 @@ qfetch是一个数据迁移工具，利用七牛提供的[fetch](http://develope
 
 使用该工具进行资源抓取的时候，可以根据需要随时可以中断任务的执行，下次重新使用原命令执行的时候，会自动跳过已经抓取成功的资源。
 
+qfetch-m3u8 是基于qfetch定制的专门针对m3u8类型的文件及其所包含的ts文件进行集体抓取的工具。只需要提供m3u8文件链接列表即可进行抓取。
+
 ### 适用场景
 
 该工具适用的场景需要满足如下条件：
@@ -20,7 +22,7 @@ qfetch是一个数据迁移工具，利用七牛提供的[fetch](http://develope
 
 |版本     |支持平台|链接|
 |--------|---------|----|
-|qfetch-m3u8 v1.8|Linux, Windows, Mac OSX|[下载](http://devtools.qiniu.com/qfetch-m3u8-v1.8.zip)|
+|qfetch-m3u8 v1.9|Linux, Windows, Mac OSX|[下载](http://devtools.qiniu.com/qfetch-m3u8-v1.9.zip)|
 
 ### 安装
 
@@ -58,8 +60,7 @@ Usage of qfetch:
   -worker=0: max goroutine in a worker group
   -log="": run log output file
   -check-exists=false: check whether file already exists in bucket, if exists, skip fetch
-  -zone="nb": qiniu zone, nb, bc, hn or na0
-```
+  ```
 
 
 |命令|描述| 必须指定 |
@@ -72,16 +73,10 @@ Usage of qfetch:
 |worker|抓取的并发数量，可以适当地指定较大的并发请求数量来提高批量抓取的效率，可根据目标源站实际带宽和文件平均大小来计算得出|是|
 |check-exists|在抓取之前检查空间是否存在同名文件，如果存在则跳过，不抓取，当指定这个参数的时候为true，不指定为false|否|
 |log|抓取过程中打印的一些日志信息输出文件，如果不指定，则输出到终端|否|
-|zone|请求发送到的入口机房，可以不指定，默认为nb，即七牛宁波机房；可选设置为bc，即七牛北京机房|否|
 
 **多机房支持**
 
-|机房|zone值|
-|----|----|
-|华东|nb|
-|华北|bc|
-|华南|hn|
-|北美|na0|
+自动检测空间所在机房
 
 **模式一:**
 

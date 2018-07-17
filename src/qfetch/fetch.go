@@ -184,9 +184,14 @@ func FetchM3u8(bucket, m3u8Key, m3u8Url string, checkExists bool, client *rs.Cli
 	for bScanner.Scan() {
 		m3u8Line := bScanner.Text()
 
-		if !strings.HasPrefix(m3u8Line, "#") {
-			//this is ts line
+		if strings.HasPrefix(m3u8Line, "#EXT-X-KEY") || !strings.HasPrefix(m3u8Line, "#") {
+			if strings.HasPrefix(m3u8Line, "#EXT-X-KEY") {
+				lastIndex := strings.LastIndex(m3u8Line, `"`)
+				startIndex := strings.Index(m3u8Line, `URI="`)
+				m3u8Line = m3u8Line[startIndex+5 : lastIndex]
+			}
 
+			//this is ts line (or key line)
 			var tsKey string
 			var tsPath string
 			if strings.HasPrefix(m3u8Line, "http://") || strings.HasPrefix(m3u8Line, "https://") {

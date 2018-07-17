@@ -39,7 +39,7 @@ func main() {
   -log="": fetch runtime log file
   -rs-host="": rs host to support specified qos system
   -io-host="": io host to support specified qos sytem
- version 2.0`)
+ version 2.1`)
 	}
 
 	flag.StringVar(&job, "job", "", "job name to record the progress")

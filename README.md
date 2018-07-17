@@ -22,7 +22,7 @@ qfetch-m3u8 是基于qfetch定制的专门针对m3u8类型的文件及其所包�
 
 |版本     |支持平台|链接|
 |--------|---------|----|
-|qfetch-m3u8 v1.9|Linux, Windows, Mac OSX|[下载](http://devtools.qiniu.com/qfetch-m3u8-v1.9.zip)|
+|qfetch-m3u8 v2.0|Linux, Windows, Mac OSX|[下载](http://devtools.qiniu.com/qfetch-m3u8-v2.0.zip)|
 
 ### 安装
 

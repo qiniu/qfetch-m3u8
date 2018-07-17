@@ -94,21 +94,17 @@ Usage of qfetch:
 例如：
 
 ```
-http://img.abc.com/0/000/484/0000484193.fid	2009-10-14/2922168_b.jpg
-http://img.abc.com/0/000/553/0000553777.fid	2009-07-01/2270194_b.jpg
-http://img.abc.com/0/000/563/0000563511.fid	2009-03-01/1650739_s.jpg
-http://img.abc.com/0/000/563/0000563514.fid	2009-05-01/1953696_m.jpg
-http://img.abc.com/0/000/563/0000563515.fid	2009-02-01/1516376_s.jpg
+http://video.example.com/proj/2018/index1.m3u8 proj/2018/index1.m3u8
+http://video.example.com/proj/2018/index2.m3u8 proj/2018/index2.m3u8
+http://video.example.com/proj/2018/index3.m3u8 proj/2018/index3.m3u8
 ```
 
 上面的方式最终抓取保存在空间中的文件名字是：
 
 ```
-2009-10-14/2922168_b.jpg
-2009-07-01/2270194_b.jpg
-2009-03-01/1650739_s.jpg
-2009-05-01/1953696_m.jpg
-2009-02-01/1516376_s.jpg
+proj/2018/index1.m3u8
+proj/2018/index2.m3u8
+proj/2018/index3.m3u8
 ```
 
 **模式二:**
@@ -127,21 +123,17 @@ http://img.abc.com/0/000/563/0000563515.fid	2009-02-01/1516376_s.jpg
 例如：
 
 ```
-http://img.abc.com/0/000/484/0000484193.fid
-http://img.abc.com/0/000/553/0000553777.fid
-http://img.abc.com/0/000/563/0000563511.fid
-http://img.abc.com/0/000/563/0000563514.fid
-http://img.abc.com/0/000/563/0000563515.fid
+http://video.example.com/proj/2018/index1.m3u8
+http://video.example.com/proj/2018/index2.m3u8
+http://video.example.com/proj/2018/index3.m3u8
 ```
 
 其抓取后保存在空间中的文件名字是：
 
 ```
-0/000/484/0000484193.fid
-0/000/553/0000553777.fid
-0/000/563/0000563511.fid
-0/000/563/0000563514.fid
-0/000/563/0000563515.fid
+proj/2018/index1.m3u8
+proj/2018/index2.m3u8
+proj/2018/index3.m3u8
 ```
 
 

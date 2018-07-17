@@ -102,12 +102,12 @@ func Fetch(mac *digest.Mac, job string, checkExists bool, fileListPath, bucket, 
 		m3u8Key := ""
 
 		if len(items) == 1 {
-			resUri, pErr := url.Parse(m3u8Url)
+			resURI, pErr := url.Parse(m3u8Url)
 			if pErr != nil {
 				log.Errorf("invalid resource url %s", m3u8Url)
 				continue
 			}
-			m3u8Key = resUri.Path
+			m3u8Key = resURI.Path
 			if strings.HasPrefix(m3u8Key, "/") {
 				m3u8Key = m3u8Key[1:]
 			}
@@ -239,34 +239,35 @@ func FetchM3u8(bucket, m3u8Key, m3u8Url string, checkExists bool, client *rs.Cli
 	var tsFetchHasError bool
 	var tsFetchErrorCount int
 	for tsKey, tsPath := range tsKeyMap {
-		tsUrl := fmt.Sprintf("%s%s", tsDomain, tsPath)
-		log.Infof("fetch ts %s => %s doing", tsUrl, tsKey)
+		tsURL := fmt.Sprintf("%s%s", tsDomain, tsPath)
 
 		//check from leveldb success whether it is done
-		val, exists := successLdb.Get([]byte(tsUrl), nil)
+		val, exists := successLdb.Get([]byte(tsURL), nil)
 		if exists == nil && string(val) == tsKey {
-			log.Infof("skip ts fetched %s => %s", tsUrl, tsKey)
+			log.Infof("skip ts fetched %s => %s", tsURL, tsKey)
 			continue
 		}
 
 		//check exists
 		if checkExists {
 			if entry, err := client.Stat(nil, bucket, tsKey); err == nil && entry.Hash != "" {
-				successLdb.Put([]byte(tsUrl), []byte(tsKey), nil)
-				log.Infof("skip ts exists %s => %s", tsUrl, tsKey)
+				successLdb.Put([]byte(tsURL), []byte(tsKey), nil)
+				log.Infof("skip ts exists %s => %s", tsURL, tsKey)
 				continue
 			}
 		}
 
+		log.Infof("fetch ts %s => %s doing", tsURL, tsKey)
+
 		//fetch each ts
-		_, fErr := client.Fetch(nil, bucket, tsKey, tsUrl)
+		_, fErr := client.Fetch(nil, bucket, tsKey, tsURL)
 		if fErr != nil {
 			tsFetchHasError = true
-			tsFetchErrorCount += 1
-			log.Errorf("fetch ts %s error, %s", tsUrl, fErr)
+			tsFetchErrorCount++
+			log.Errorf("fetch ts %s error, %s", tsURL, fErr)
 		} else {
-			log.Infof("fetch ts %s => %s success", tsUrl, tsKey)
-			successLdb.Put([]byte(tsUrl), []byte(tsKey), nil)
+			log.Infof("fetch ts %s => %s success", tsURL, tsKey)
+			successLdb.Put([]byte(tsURL), []byte(tsKey), nil)
 		}
 	}
 

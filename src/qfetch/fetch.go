@@ -176,7 +176,7 @@ func FetchM3u8(bucket, m3u8Key, m3u8Url string, checkExists bool, client *rs.Cli
 	m3u8Resp.Body.Close()
 
 	//scan ts
-	tsKeyList := make([]string, 0, 1000)
+	tsKeyMap := make(map[string]string)
 	var tsDomain string
 
 	//scan m3u8 content
@@ -188,6 +188,7 @@ func FetchM3u8(bucket, m3u8Key, m3u8Url string, checkExists bool, client *rs.Cli
 			//this is ts line
 
 			var tsKey string
+			var tsPath string
 			if strings.HasPrefix(m3u8Line, "http://") || strings.HasPrefix(m3u8Line, "https://") {
 				tsUri, pErr := url.Parse(m3u8Line)
 				if pErr != nil {
@@ -195,33 +196,50 @@ func FetchM3u8(bucket, m3u8Key, m3u8Url string, checkExists bool, client *rs.Cli
 					continue
 				}
 
+				tsPath = tsUri.Path
 				tsKey = strings.TrimPrefix(tsUri.Path, "/")
 				tsDomain = fmt.Sprintf("%s://%s", tsUri.Scheme, tsUri.Host)
+				tsKeyMap[tsKey] = tsPath
 			} else {
 				if strings.HasPrefix(m3u8Line, "/") {
+					tsPath = m3u8Line
 					tsKey = strings.TrimPrefix(m3u8Line, "/")
+					tsKeyMap[tsKey] = tsPath
 				} else {
-					//check m3u8 url to find ts prefix
-					tsKeyPrefix := strings.TrimPrefix(filepath.Dir(m3u8Uri.Path), "/")
-					if tsKeyPrefix != "" {
+					//check m3u8 url to find ts path prefix
+					tsPathPrefix := strings.TrimPrefix(filepath.Dir(m3u8Uri.Path), "/")
+					if tsPathPrefix != "" {
 						//Dir function removes the last / of the path, so there is a new / here
+						tsPath = fmt.Sprintf("/%s/%s", tsPathPrefix, m3u8Line)
+					} else {
+						tsPath = fmt.Sprintf("/%s", m3u8Line)
+					}
+
+					//check target m3u8 key prefix
+					var tsKeyPrefix string
+					lastSlashIndex := strings.LastIndex(m3u8Key, "/")
+					if lastSlashIndex != -1 {
+						tsKeyPrefix = m3u8Key[:lastSlashIndex]
+					}
+
+					if tsKeyPrefix != "" {
 						tsKey = fmt.Sprintf("%s/%s", tsKeyPrefix, m3u8Line)
 					} else {
 						tsKey = m3u8Line
 					}
+
+					tsKeyMap[tsKey] = tsPath
 				}
 				tsDomain = fmt.Sprintf("%s://%s", m3u8Uri.Scheme, m3u8Uri.Host)
 			}
-			//append
-			tsKeyList = append(tsKeyList, tsKey)
 		}
 	}
 
 	//fetch all the ts files firsts
 	var tsFetchHasError bool
 	var tsFetchErrorCount int
-	for _, tsKey := range tsKeyList {
-		tsUrl := fmt.Sprintf("%s/%s", tsDomain, tsKey)
+	for tsKey, tsPath := range tsKeyMap {
+		tsUrl := fmt.Sprintf("%s%s", tsDomain, tsPath)
 		log.Infof("fetch ts %s => %s doing", tsUrl, tsKey)
 
 		//check from leveldb success whether it is done
